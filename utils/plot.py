@@ -1,29 +1,21 @@
-import plotly.graph_objects as go
-import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
-def plot_3d_trajectory(trajectory):
-    trajectory = np.array(trajectory)
-    fig = go.Figure()
+def plot_trajectory(trajectory):
+    """
+    Plot the drone trajectory in 3D.
+    :param trajectory: Array of states over time
+    """
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
 
-    fig.add_trace(go.Scatter3d(
-        x=trajectory[:, 0],
-        y=trajectory[:, 1],
-        z=trajectory[:, 2],
-        mode='lines',
-        name='Trajectory'
-    ))
+    x = trajectory[:, 0]
+    y = trajectory[:, 1]
+    z = trajectory[:, 2]
 
-    fig.update_layout(scene=dict(
-        xaxis_title='X',
-        yaxis_title='Y',
-        zaxis_title='Z'
-    ))
-
-    fig.show()
-
-# Example Usage
-if __name__ == "__main__":
-    # Example trajectory data
-    trajectory = np.array([[0, 0, 1], [1, 1, 1.5], [2, 1, 2], [3, 2, 2.5]])
-    plot_3d_trajectory(trajectory)
-
+    ax.plot(x, y, z, label="Drone Trajectory")
+    ax.set_xlabel('X Position')
+    ax.set_ylabel('Y Position')
+    ax.set_zlabel('Z Position')
+    ax.legend()
+    plt.show()

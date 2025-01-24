@@ -1,29 +1,28 @@
-import pybullet as p
-import pybullet_data
 import numpy as np
-import time
 
-def setup_simulation():
-    p.connect(p.GUI)
-    p.setAdditionalSearchPath(pybullet_data.getDataPath())
-    p.loadURDF("plane.urdf")
-    p.setGravity(0, 0, -9.81)
+def simulate_drone(A, B, K, initial_state, target_state, dt, steps):
+    """
+    Simulate drone dynamics with LQR controller.
+    :param A: State matrix
+    :param B: Input matrix
+    :param K: LQR gain matrix
+    :param initial_state: Initial state vector
+    :param target_state: Desired state vector
+    :param dt: Time step
+    :param steps: Number of simulation steps
+    """
+    state = np.array(initial_state)
+    trajectory = [state]
 
-    # Load drone
-    drone = p.loadURDF("samurai.urdf", basePosition=[0, 0, 1])
+    for _ in range(steps):
+        # Compute error
+        error = state - target_state
 
-    # Add obstacle
-    obstacle = p.loadURDF("cube.urdf", basePosition=[2, 0, 0.5], globalScaling=0.5)
+        # Compute control input using LQR
+        u = -K @ error
 
-    return drone, obstacle
+        # Update state (discretized dynamics)
+        state = state + (A @ state + B @ u) * dt
+        trajectory.append(state)
 
-def apply_wind_force(drone_id):
-    wind_force = np.random.normal(0, 0.1, 3)  # Simulates random wind
-    p.applyExternalForce(drone_id, -1, wind_force, [0, 0, 0], p.WORLD_FRAME)
-
-if __name__ == "__main__":
-    drone, obstacle = setup_simulation()
-
-    for i in range(1000):
-        apply_wind_force(drone)
-        time.sleep(0.01)
+    return np.array(trajectory)
