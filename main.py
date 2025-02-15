@@ -2,6 +2,7 @@ from drone_dynamics.dynamics import get_state_space_matrices
 from drone_dynamics.lqr_controller import tune_lqr_gains
 from simulation.simulator import simulate_drone
 from simulation.visualize_3d import plot_trajectory
+import numpy as np
 
 def main():
     # Drone parameters
@@ -11,14 +12,15 @@ def main():
     drag_coefficient = 0.1
 
     # Get state-space matrices
-    A, B, _, _ = get_state_space_matrices(mass, gravity, inertia, drag_coefficient)
+    A, B, C, D = get_state_space_matrices(mass, gravity, inertia)
 
     # Get LQR gains
-    K = tune_lqr_gains(mass, gravity, inertia, drag_coefficient)
+    K = tune_lqr_gains(A, B)
 
     # Initial and target states
     initial_state = np.zeros(12)
     target_state = np.array([1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+
 
     # Simulate
     dt = 0.01
